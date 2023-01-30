@@ -1,3 +1,4 @@
+import time
 import sys
 import time
 import pygame
@@ -11,14 +12,16 @@ cell_number = 25
 WIDTH = cell_number * cell_size
 HEIGHT = cell_number * cell_size
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-
-
+score = 0
+time1 = time.time()
+global cnt
+cnt = 0
 class hero:
     def __init__(self):
         self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
         self.direction = Vector2(0, 0)
         self.new_block = False
-        self.score = 0
+
 
     def draw_snake(self):
         for index, block in enumerate(self.body):
@@ -70,13 +73,9 @@ class hero:
         self.new_block = True
 
     def goldearn(self):
+        global cnt
         random.choice([goldearnsound1, goldearnsound2, goldearnsound3]).play()
-        self.score += 1
-        print(self.score)
-
-    def score(self):
-        return self.score
-
+        cnt += 1
     def reset(self):
         self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
         self.direction = Vector2(0, 0)
@@ -126,22 +125,22 @@ class game:
             if block == self.snake.body[0]:
                 self.snake.reset()
 
+def terminate():
+    pygame.quit()
+    sys.exit()
 
 def start_screen():
-    intro_text = ["Перемещение героя", "",
-                  "Герой двигается",
-                  "Камера двигается"]
-
-    fon = pygame.transform.scale(load_image('fon.jpg'), (WIDTH, HEIGHT))
+    intro_text = ["Press any button to start..."]
+    fon = pygame.transform.scale(pygame.image.load('fon.png'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 30)
-    text_coord = 50
+    font = pygame.font.Font(None, 40)
+    text_coord = 750
     for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('black'))
+        string_rendered = font.render(line, 1, pygame.Color('yellow'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = 10
+        intro_rect.x = 200
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
 
@@ -151,9 +150,9 @@ def start_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
-                return  # начинаем игру
+                return
         pygame.display.flip()
-        clock.tick(FPS)
+        clock.tick(60)
 
 def texload(a):
     return pygame.image.load('textures/' + str(a) + '.png').convert_alpha()
@@ -179,12 +178,14 @@ SCREEN_UPDATE = pygame.USEREVENT
 start_screen()
 pygame.time.set_timer(SCREEN_UPDATE, 100)
 main_game = game()
+get = hero()
+get.goldearn()
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            st = hero()
             print('СТАТИСТИКА ЗА ИГРУ:')
-            print("ВЫ НАБРАЛИ", st.score, "ЗОЛОТА!")
+            print("ВЫ ИГРАЛИ", (time.time() - time1)//0.1/10, "СЕКУНД")
+            print("ВЫ НАБРАЛИ", cnt, "ЗОЛОТА!")
             pygame.quit()
             sys.exit()
         if event.type == SCREEN_UPDATE:
@@ -202,6 +203,6 @@ while True:
             if event.key == pygame.K_LEFT:
                 if main_game.snake.direction.x != 1:
                     main_game.snake.direction = Vector2(-1, 0)
-    screen.blit(pygame.image.load('fon.png'), (0, 0))
+    screen.blit(pygame.image.load('map.png'), (0, 0))
     main_game.drawel()
     pygame.display.update()
