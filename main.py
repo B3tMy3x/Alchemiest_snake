@@ -127,9 +127,23 @@ class game:
                 self.snake.reset()
 
 
-def terminate():
-    pygame.quit()
-    sys.exit()
+def start_screen():
+    intro_text = ["Перемещение героя", "",
+                  "Герой двигается",
+                  "Камера двигается"]
+
+    fon = pygame.transform.scale(load_image('fon.jpg'), (WIDTH, HEIGHT))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 50
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color('black'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
 
     while True:
         for event in pygame.event.get():
@@ -139,7 +153,7 @@ def terminate():
                     event.type == pygame.MOUSEBUTTONDOWN:
                 return  # начинаем игру
         pygame.display.flip()
-
+        clock.tick(FPS)
 
 def texload(a):
     return pygame.image.load('textures/' + str(a) + '.png').convert_alpha()
@@ -162,7 +176,7 @@ goldearnsound1 = pygame.mixer.Sound('sounds/goldearn1.wav')
 goldearnsound2 = pygame.mixer.Sound('sounds/goldearn2.wav')
 goldearnsound3 = pygame.mixer.Sound('sounds/goldearn3.wav')
 SCREEN_UPDATE = pygame.USEREVENT
-screen.blit(pygame.image.load('fon.png'), (0, 0))
+start_screen()
 pygame.time.set_timer(SCREEN_UPDATE, 100)
 main_game = game()
 while True:
